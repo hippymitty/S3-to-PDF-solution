@@ -1,0 +1,39 @@
+service: ReportingLambda
+
+package:
+  include:
+    - src/**
+  exclude:
+    - .requirements.zip
+    - node_modules/**
+    - venv/**
+    - .serverless/**
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: ap-southeast-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::${self:custom.bucket}/*"
+
+custom:
+  bucket: "sami-reporting-bucket-${self:provider.stage}"
+  pythonRequirements:
+    dockerizePip: true
+
+functions:
+  generateReport:
+    handler: src/analytics.lambda_handler
+    events:
+      - s3:
+          bucket: ${self:custom.bucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: ocrdashboard/
+
+plugins:
+  - serverless-python-requirements

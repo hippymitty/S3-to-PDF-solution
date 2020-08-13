@@ -1,0 +1,7 @@
+pandas
+numpy
+matplotlib==3.0.2
+boto3
+pytest
+parse
+xlrd
